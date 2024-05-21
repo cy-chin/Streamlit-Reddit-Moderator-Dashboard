@@ -111,13 +111,14 @@ def calculate_total(row):
 def calculate_percentage(row):
     threshold_1 = 45.0
     threshold_2 = 50.0
-    row['Misinformation%'] = 100* row[1]/row['Total']
-    if row['Misinformation%'] >= threshold_2:
-        row['Misinformation Alert'] = "ALERT"
-    elif threshold_1 < row['Misinformation%'] < threshold_2:
-        row['Misinformation Alert'] = "WARNING"
+    row['Misinfo_%'] = 100* row[1]/row['Total']
+    if row['Misinfo_%'] >= threshold_2:
+        row['Misinformation ALERT'] = "ALERT"
+        st.session_state.prediction_outcome += 1
+    elif threshold_1 < row['Misinfo_%'] < threshold_2:
+        row['Misinformation ALERT'] = "WARNING"
     else:
-        row['Misinformation Alert'] = "N"
+        row['Misinformation ALERT'] = "no Action"
     return row
 
 
@@ -152,10 +153,13 @@ st.set_page_config(page_title='Reddit Moderator - DASHBOARD',
                    })
 st.subheader("Welcome, Daniel!")
 
+if "prediction_outcome" not in st.session_state:
+    st.session_state.prediction_outcome = 0
+
 # Set title of the app
 st.title("Reddit Moderator DASHBOARD .. What's hot")
-subreddit = st.selectbox("Subreddits you are moderating. Which one to monitor? ",['politics','news',]) 
-hot_num = st.slider('How many hot topic in your monitoring?', 0, 10, 5)
+subreddit = st.selectbox("Here's the list of subreddit assigned to you. Pick one to proceed monitoring? ",['politics','news',]) 
+hot_num = st.slider('How many hot topic you would like to monitor?', 0, 10, 5)
 progress_text = "Gathering the comments. Please wait..."
 progress_text_done = "All comments are ready for analyzing"
 progress_text_2 = "Analyzing the comments. This may take some time ..."
@@ -170,6 +174,7 @@ if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
     response = requests.get(url, headers={'User-agent': 'MyStreamlitApp/1.0'})
     if response.status_code == 200:
+        st.session_state.prediction_outcome = 0 #reset prediction outcome
         my_bar = st.progress(0.1, text=progress_text)
         json_data = response.json()
         submission_count = 0 
@@ -203,7 +208,7 @@ if button1:
         # Loop through each submission URL
         for n, url in enumerate(submission_urls):
             # Send a GET request to retrieve the JSON data
-            response = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
+            response = requests.get(url, headers={'User-agent': 'MyStreamlitApp/1.0'})
             
             # Check if the request was successful
             if response.status_code == 200:
@@ -267,19 +272,29 @@ if button1:
 
         comments_df['label'] = pd.DataFrame(y_predict)
 
-        # groupby 'Pclass' and 'Survived'
         t = comments_df.groupby(['title','label']).size()
-
-        # unstack 'Survived' to the columns
-        dt = t.unstack(['label'])
+        comments_label_df = t.unstack(['label'])
     
         # first apply the calculate_total function to calculate the total of each row, and create a new column 'Total',for each pclass
-        dt2 = dt.apply(calculate_total, axis=1)
+        comments_label_df = comments_label_df.apply(calculate_total, axis=1)
 
         # then, apply the calculate_percentage function to calculate the percentage for each pclass
-        dt3 = dt2.apply(calculate_percentage, axis=1)
+        comments_analyzed_df = comments_label_df.apply(calculate_percentage, axis=1)
+        comments_analyzed_df.rename(columns={'title':'Post Subject','0':'Misinfo_NO','1':'MisInfo_POSSIBLE'}, inplace=True)
 
-        st.write(dt3)
-        st.success("Please pay attention to the submissions with ALERT")
+        st.write(comments_analyzed_df)
+
+        if st.session_state.prediction_outcome > 0:
+            text_high_risk = f"❕There are <b>{st.session_state.prediction_outcome} posts</b> possible having misinformation❕<br>Post with more than 45% possible misinformation is marked 'WARNING'.<br>Post with more than 50% possible misinformation is marked 'ALERT'"
+            html_high_risk = f"""<p style='background-color: rgb(250, 60, 60, 1); color: rgb(255,255,255,1); font-size:20px; 
+                                    border-radius: 7px; padding-left: 12px; padding-top: 13px; padding-bottom: 13px; line-height: 25px;'>
+                                {text_high_risk}</style><BR></p>"""
+            st.markdown(html_high_risk, unsafe_allow_html=True)
+        else: 
+            text_low_risk = f"⭐ None of the posts are having misinformation ⭐"
+            html_low_risk = f"""<p style='background-color: rgb(0, 204, 102, 1); color: rgb(255,255,255,1); font-size:20px; 
+                                        border-radius: 7px; padding-left: 12px; padding-top: 13px; padding-bottom: 13px; line-height: 25px;'>
+                                    {text_low_risk}</style><BR></p>"""
+            st.markdown(html_low_risk, unsafe_allow_html=True)
     else: 
         st.write(f"Fail to load content, please try again later. #Status Response {response.status_code}# ")
