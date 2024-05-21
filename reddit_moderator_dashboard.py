@@ -134,16 +134,6 @@ st.subheader("Welcome, Daniel!")
 
 # Set title of the app
 st.title("Reddit Moderator DASHBOARD .. What's hot")
-
-options = st.multiselect(
-    "What are your favorite colors",
-    ["Green", "Yellow", "Red", "Blue"],
-    ["Yellow", "Red"])
-
-st.write("You selected:", options)
-
-
-st.write(get_total_num)
 subreddit = st.selectbox("Subreddits you are moderating. Which one to monitor? ",['politics','news',]) 
 hot_num = st.slider('How many hot topic?', 0, 10, 5)
 progress_text = "Gathering the comments. Please wait..."
@@ -170,7 +160,7 @@ if button1:
             submission_ids.append(post['data']['id'])
             submission_count += 1 
 
-        submission_urls = [ f"https://www.reddit.com/r/politics/comments/{id}.json" for id in submission_ids ]
+        submission_urls = [ f"https://www.reddit.com/r/{subreddit}/comments/{id}.json" for id in submission_ids ]
         # st.write(submission_urls)
 
         def extract_comments(comment, submission_title, comments_list):
