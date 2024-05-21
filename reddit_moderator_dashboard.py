@@ -168,7 +168,7 @@ button1 = st.button('Start Analyzing')
 
 if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    response = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
+    response = requests.get(url, headers={'User-agent': 'MyStreamlitApp/1.0'})
     if response.status_code == 200:
         my_bar = st.progress(0.1, text=progress_text)
         json_data = response.json()
@@ -234,8 +234,6 @@ if button1:
 
         # Create DataFrame from all comments
         comments_df = pd.DataFrame(all_comments_list)
-
-        st.write(comments_df)
 
         my_bar2 = st.progress(0.1, text=progress_text_2)
 
