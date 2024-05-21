@@ -16,11 +16,16 @@ import string
 import requests 
 import numpy as np
 import re
+
+import nltk 
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk import word_tokenize
 from nltk import pos_tag
+
+nltk.download('stopwords')
 from nltk.corpus import stopwords
+stop_words = set(stopwords.words('english'))
 
 def get_wordnet_pos(word):
     """Map POS tag to first character lemmatize() accepts"""
@@ -135,7 +140,7 @@ st.subheader("Welcome, Daniel!")
 # Set title of the app
 st.title("Reddit Moderator DASHBOARD .. What's hot")
 subreddit = st.selectbox("Subreddits you are moderating. Which one to monitor? ",['politics','news',]) 
-hot_num = st.slider('How many hot topic?', 0, 10, 5)
+hot_num = st.slider('How many hot topic in your monitoring?', 0, 10, 5)
 progress_text = "Gathering the comments. Please wait..."
 progress_text_done = "All comments are ready for analyzing"
 progress_text_2 = "Analyzing the comments. This may take some time ..."
@@ -219,7 +224,6 @@ if button1:
 
     #st.write(f"All comments from multiple submissions (including comment forests) download into dataframe successfully.")
 
-    stop_words = set(stopwords.words('english'))
     special_char_list = list(string.punctuation)
     special_char_list+=["’","'s","’s","...","$","@$$.","like", "it", "would", "im","“", "”", "u"]
 
