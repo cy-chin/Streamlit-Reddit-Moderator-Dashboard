@@ -7,6 +7,9 @@ Note: perform the following before able to access the app from web browser
 '''
 
 
+from pathlib import Path
+
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -90,7 +93,7 @@ def text_cleaning_post_lemmatized(text):
 
     # pattern2 of a standard footer in a submission template
     pattern2 = r'nonmobile\slink\shelperbot\sv11\srhelperbot\si\sbe\sa\sbot\splease\smessage\suswim1929\swith\sany\sfeedback\sandor\shate\scounter\s\d{6}'
-    text = re.sub(pattern, '', text)
+    text = re.sub(pattern2, '', text)
 
     # pattern to find any words that are repeating more than 2 times, replace with only 1 occurence of the word
     text = re.sub(r'\b(\w+)(?: \1\b)+', r'\1', text.lower())
@@ -117,13 +120,25 @@ def calculate_percentage(row):
         row['Misinformation Alert'] = "N"
     return row
 
+
 # trained model
-with open(r"./model.pkl", 'rb') as rf_model:
+pkl_path = Path(__file__).parents[0] / "model.pkl"
+with open(pkl_path, 'rb') as rf_model:
     model = pickle.load(rf_model)
 
 # fitted transformer - CountVectorizer, to transform the data before calling to model (for prediction)
-with open(r"./count_vectorizer.pkl", 'rb') as rf_cv:
+rf_path = Path(__file__).parents[0] / "count_vectorizer.pkl"
+with open(rf_path, 'rb') as rf_cv:
     cvec = pickle.load(rf_cv)
+
+
+# # trained model
+# with open(r"./model.pkl", 'rb') as rf_model:
+#     model = pickle.load(rf_model)
+
+# # fitted transformer - CountVectorizer, to transform the data before calling to model (for prediction)
+# with open(r"./count_vectorizer.pkl", 'rb') as rf_cv:
+#     cvec = pickle.load(rf_cv)
 
 
 st.set_page_config(page_title='Reddit Moderator - DASHBOARD', 
@@ -219,6 +234,8 @@ if button1:
 
         # Create DataFrame from all comments
     comments_df = pd.DataFrame(all_comments_list)
+
+    st.write(comments_df)
 
     my_bar2 = st.progress(0.1, text=progress_text_2)
 
