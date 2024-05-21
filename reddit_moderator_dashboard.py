@@ -233,53 +233,55 @@ if button1:
             my_bar = st.progress(1.0, text=progress_text_done)
 
         # Create DataFrame from all comments
-    comments_df = pd.DataFrame(all_comments_list)
+        comments_df = pd.DataFrame(all_comments_list)
 
-    st.write(comments_df)
+        st.write(comments_df)
 
-    my_bar2 = st.progress(0.1, text=progress_text_2)
+        my_bar2 = st.progress(0.1, text=progress_text_2)
 
-    #st.write(f"All comments from multiple submissions (including comment forests) download into dataframe successfully.")
+        #st.write(f"All comments from multiple submissions (including comment forests) download into dataframe successfully.")
 
-    special_char_list = list(string.punctuation)
-    special_char_list+=["’","'s","’s","...","$","@$$.","like", "it", "would", "im","“", "”", "u"]
-
-
-
-    comments_df['comments_cleaned'] = comments_df['body'].map(text_cleaning)
-    my_bar2.empty()
-    my_bar2 = st.progress(0.4, text=progress_text_2)
-    comments_df['comments_cleaned_lemmatized'] = comments_df['comments_cleaned'].map(sentence_lemmatizer)
-    my_bar2.empty()
-    my_bar2 = st.progress(0.7, text=progress_text_2)
-    comments_df = comments_df.dropna(subset=['comments_cleaned_lemmatized'])
-    my_bar2.empty()
-    my_bar2 = st.progress(0.9, text=progress_text_2)
-    comments_df['comments_cleaned_lemmatized'].isnull().sum() 
-    comments_df.reset_index(drop=True, inplace=True)
-
-    comments_df['comments_cleaned_lemmatized_cleaned'] = comments_df['comments_cleaned_lemmatized'].map(text_cleaning_post_lemmatized)
-    my_bar2.empty()
-    my_bar2 = st.progress(1.0, text=progress_text_2)
+        special_char_list = list(string.punctuation)
+        special_char_list+=["’","'s","’s","...","$","@$$.","like", "it", "would", "im","“", "”", "u"]
 
 
-    X = cvec.transform(comments_df['comments_cleaned_lemmatized_cleaned'])
 
-    y_predict = model.predict(X)
+        comments_df['comments_cleaned'] = comments_df['body'].map(text_cleaning)
+        my_bar2.empty()
+        my_bar2 = st.progress(0.4, text=progress_text_2)
+        comments_df['comments_cleaned_lemmatized'] = comments_df['comments_cleaned'].map(sentence_lemmatizer)
+        my_bar2.empty()
+        my_bar2 = st.progress(0.7, text=progress_text_2)
+        comments_df = comments_df.dropna(subset=['comments_cleaned_lemmatized'])
+        my_bar2.empty()
+        my_bar2 = st.progress(0.9, text=progress_text_2)
+        comments_df['comments_cleaned_lemmatized'].isnull().sum() 
+        comments_df.reset_index(drop=True, inplace=True)
 
-    comments_df['label'] = pd.DataFrame(y_predict)
+        comments_df['comments_cleaned_lemmatized_cleaned'] = comments_df['comments_cleaned_lemmatized'].map(text_cleaning_post_lemmatized)
+        my_bar2.empty()
+        my_bar2 = st.progress(1.0, text=progress_text_2)
 
-    # groupby 'Pclass' and 'Survived'
-    t = comments_df.groupby(['title','label']).size()
 
-    # unstack 'Survived' to the columns
-    dt = t.unstack(['label'])
- 
-    # first apply the calculate_total function to calculate the total of each row, and create a new column 'Total',for each pclass
-    dt2 = dt.apply(calculate_total, axis=1)
+        X = cvec.transform(comments_df['comments_cleaned_lemmatized_cleaned'])
 
-    # then, apply the calculate_percentage function to calculate the percentage for each pclass
-    dt3 = dt2.apply(calculate_percentage, axis=1)
+        y_predict = model.predict(X)
 
-    st.write(dt3)
-    st.success("Please pay attention to the submissions with ALERT")
+        comments_df['label'] = pd.DataFrame(y_predict)
+
+        # groupby 'Pclass' and 'Survived'
+        t = comments_df.groupby(['title','label']).size()
+
+        # unstack 'Survived' to the columns
+        dt = t.unstack(['label'])
+    
+        # first apply the calculate_total function to calculate the total of each row, and create a new column 'Total',for each pclass
+        dt2 = dt.apply(calculate_total, axis=1)
+
+        # then, apply the calculate_percentage function to calculate the percentage for each pclass
+        dt3 = dt2.apply(calculate_percentage, axis=1)
+
+        st.write(dt3)
+        st.success("Please pay attention to the submissions with ALERT")
+    else: 
+        st.write(f"Fail to load content, please try again later. #Status Response {response.status_code}# ")
