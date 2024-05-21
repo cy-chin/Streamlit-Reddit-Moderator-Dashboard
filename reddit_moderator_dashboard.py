@@ -147,7 +147,6 @@ all_comments_list = []
 button1 = st.button('Start Analyzing') 
 
 if button1:
-    st.write(options)
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
     response = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
     if response.status_code == 200:
