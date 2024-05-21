@@ -9,25 +9,18 @@ Note: perform the following before able to access the app from web browser
 
 import streamlit as st
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pickle
-from string import capwords 
 
 import string
 import requests 
-import time
 import numpy as np
 import re
-from spellchecker import SpellChecker
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk import word_tokenize
 from nltk import pos_tag
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.linear_model import LogisticRegression
 
 def get_wordnet_pos(word):
     """Map POS tag to first character lemmatize() accepts"""
