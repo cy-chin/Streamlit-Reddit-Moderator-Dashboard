@@ -176,11 +176,11 @@ button1 = st.button('Start Analyzing')
 proxy = {
     'http':'http://20.24.43.214:80',
 }
-st.write("with proxy")
+# st.write("with proxy,", ua.random)
 if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    # response = requests.get(url, headers={'User-agent': 'StreamlitApp/1.0'})
-    response = requests.get(url, headers={'User-agent':ua.random}, proxies=proxy)
+    response = requests.get(url, headers={'User-agent': 'MyFirstStreamlistApp/1.0 by ME'})
+    # response = requests.get(url, headers={'User-agent':ua.random}, proxies=proxy)
     if response.status_code == 200:
         st.session_state.prediction_outcome = 0 #reset prediction outcome
         my_bar = st.progress(0.1, text=progress_text)
