@@ -174,8 +174,9 @@ all_comments_list = []
 button1 = st.button('Start Analyzing') 
 
 proxy = {
-    'http':'http://20.24.43.214:8123',
+    'http':'http://20.24.43.214:80',
 }
+st.write("with proxy")
 if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
     # response = requests.get(url, headers={'User-agent': 'StreamlitApp/1.0'})
