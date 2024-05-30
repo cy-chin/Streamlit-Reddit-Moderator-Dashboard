@@ -175,7 +175,7 @@ button1 = st.button('Start Analyzing')
 
 if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    response = requests.get(url, headers={'User-agent': 'StreamlitApp/1.0'})
+    # response = requests.get(url, headers={'User-agent': 'StreamlitApp/1.0'})
     response = requests.get(url, headers={'User-agent':ua.random})
     if response.status_code == 200:
         st.session_state.prediction_outcome = 0 #reset prediction outcome
@@ -212,8 +212,8 @@ if button1:
         # Loop through each submission URL
         for n, url in enumerate(submission_urls):
             # Send a GET request to retrieve the JSON data
-            response = requests.get(url, headers={'User-agent': 'MyStreamlitApp/1.0'})
-            
+            # response = requests.get(url, headers={'User-agent': 'MyStreamlitApp/1.0'})
+            response = requests.get(url, headers={'User-agent':ua.random})
             # Check if the request was successful
             if response.status_code == 200:
                 # Parse the JSON data
