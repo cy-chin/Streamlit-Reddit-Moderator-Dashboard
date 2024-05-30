@@ -26,6 +26,9 @@ from nltk.corpus import wordnet
 from nltk import word_tokenize
 from nltk import pos_tag
 
+from fake_useragent import UserAgent
+ua = UserAgent()
+
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
@@ -173,6 +176,7 @@ button1 = st.button('Start Analyzing')
 if button1:
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
     response = requests.get(url, headers={'User-agent': 'StreamlitApp/1.0'})
+    response = requests.get(url, headers={'User-agent':ua.random})
     if response.status_code == 200:
         st.session_state.prediction_outcome = 0 #reset prediction outcome
         my_bar = st.progress(0.1, text=progress_text)
